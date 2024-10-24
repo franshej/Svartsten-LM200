@@ -1,0 +1,6 @@
+[submodule "externals/JUCE"]
+	path = externals/JUCE
+	url = https://github.com/franshej/JUCE.git
+[submodule "externals/CMP"]
+	path = externals/CMP
+	url = https://github.com/franshej/CustomMatPlot.git
