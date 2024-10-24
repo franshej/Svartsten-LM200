@@ -21,6 +21,7 @@
 
 #include <string>
 
+#include "AmpButton.h"
 #include "cmp_datamodels.h"
 
 using namespace juce;
@@ -40,7 +41,19 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
                        false)         // hide advanced options
         ,
         forwardFFT(fftOrder),
-        window(fftSize, juce::dsp::WindowingFunction<float>::hann) {
+        window(fftSize, juce::dsp::WindowingFunction<float>::hann),
+        m_button_on_off(AmpButton(
+            "On/Off",
+            juce::ImageFileFormat::loadFrom(
+                juce::File::getSpecialLocation(
+                    juce::File::SpecialLocationType::currentExecutableFile)
+                    .getParentDirectory()
+                    .getChildFile("img/on_off_logo_on.png")),
+                    juce::ImageFileFormat::loadFrom(
+                juce::File::getSpecialLocation(
+                    juce::File::SpecialLocationType::currentExecutableFile)
+                    .getParentDirectory()
+                    .getChildFile("img/on_off_logo_off.png")))){
     RuntimePermissions::request(
         RuntimePermissions::recordAudio, [this](bool granted) {
           int numInputChannels = granted ? num_channels : 0;
@@ -49,6 +62,7 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
 
     addAndMakeVisible(audioSetupComp);
     addAndMakeVisible(m_plot);
+    addAndMakeVisible(m_button_on_off);
 
     startTimerHz(30);
     setSize(800, 480);
@@ -78,8 +92,12 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
 
     cmp::GraphAttributeList attr(num_channels);
 
-    attr[0].gradient_colours = {juce::Colour(juce::Colours::aqua).withAlpha(0.70f), juce::Colour(Colours::whitesmoke).withAlpha(0.40f)};
-    attr[1].gradient_colours = {juce::Colour(juce::Colours::rebeccapurple).withAlpha(0.70f), juce::Colour(Colours::navajowhite).withAlpha(0.40f)};
+    attr[0].gradient_colours = {
+        juce::Colour(juce::Colours::aqua).withAlpha(0.70f),
+        juce::Colour(Colours::whitesmoke).withAlpha(0.40f)};
+    attr[1].gradient_colours = {
+        juce::Colour(juce::Colours::rebeccapurple).withAlpha(0.70f),
+        juce::Colour(Colours::navajowhite).withAlpha(0.40f)};
 
     m_plot.plot(fftData, x_data, attr);
   }
@@ -87,9 +105,14 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
   void resized() override {
     auto rect = getLocalBounds();
 
-    m_plot.setBounds(rect.removeFromLeft(proportionOfWidth(0.7f)));
-
+    m_plot.setBounds(rect.removeFromLeft(proportionOfWidth(0.7f))
+                         .removeFromTop(proportionOfHeight(0.7f)));
     audioSetupComp.setBounds(rect.removeFromRight(proportionOfWidth(0.3f)));
+
+    auto rect_button = getLocalBounds()
+                           .removeFromBottom(proportionOfHeight(0.3f))
+                           .removeFromLeft(proportionOfWidth(0.25f));
+    m_button_on_off.setBounds(rect_button);
   }
 
   void releaseResources() override {
@@ -196,7 +219,7 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
 
   cmp::SemiLogX m_plot;
 
-  juce::Button m_button_moode, m_button_analog, m_button_on_off;
+  AmpButton m_button_on_off;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SimpleFreqRespDemo)
 };
