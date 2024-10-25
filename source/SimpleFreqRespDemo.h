@@ -48,12 +48,36 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
                 juce::File::getSpecialLocation(
                     juce::File::SpecialLocationType::currentExecutableFile)
                     .getParentDirectory()
-                    .getChildFile("img/on_off_logo_on.png")),
-                    juce::ImageFileFormat::loadFrom(
+                    .getChildFile("img/on_off_icon_on.png")),
+            juce::ImageFileFormat::loadFrom(
                 juce::File::getSpecialLocation(
                     juce::File::SpecialLocationType::currentExecutableFile)
                     .getParentDirectory()
-                    .getChildFile("img/on_off_logo_off.png")))){
+                    .getChildFile("img/on_off_icon_off.png")))),
+        m_button_rca(AmpButton(
+            "RCA",
+            juce::ImageFileFormat::loadFrom(
+                juce::File::getSpecialLocation(
+                    juce::File::SpecialLocationType::currentExecutableFile)
+                    .getParentDirectory()
+                    .getChildFile("img/rca_icon_on.png")),
+            juce::ImageFileFormat::loadFrom(
+                juce::File::getSpecialLocation(
+                    juce::File::SpecialLocationType::currentExecutableFile)
+                    .getParentDirectory()
+                    .getChildFile("img/rca_icon_off.png")))),
+        m_button_moode(AmpButton(
+            "Moode",
+            juce::ImageFileFormat::loadFrom(
+                juce::File::getSpecialLocation(
+                    juce::File::SpecialLocationType::currentExecutableFile)
+                    .getParentDirectory()
+                    .getChildFile("img/moode_icon_on.png")),
+            juce::ImageFileFormat::loadFrom(
+                juce::File::getSpecialLocation(
+                    juce::File::SpecialLocationType::currentExecutableFile)
+                    .getParentDirectory()
+                    .getChildFile("img/moode_icon_off.png")))) {
     RuntimePermissions::request(
         RuntimePermissions::recordAudio, [this](bool granted) {
           int numInputChannels = granted ? num_channels : 0;
@@ -63,6 +87,8 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
     addAndMakeVisible(audioSetupComp);
     addAndMakeVisible(m_plot);
     addAndMakeVisible(m_button_on_off);
+    addAndMakeVisible(m_button_rca);
+    addAndMakeVisible(m_button_moode);
 
     startTimerHz(30);
     setSize(800, 480);
@@ -113,6 +139,12 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
                            .removeFromBottom(proportionOfHeight(0.3f))
                            .removeFromLeft(proportionOfWidth(0.25f));
     m_button_on_off.setBounds(rect_button);
+
+    rect_button.setX(rect_button.getRight());
+    m_button_rca.setBounds(rect_button);
+
+    rect_button.setX(rect_button.getRight());
+    m_button_moode.setBounds(rect_button);
   }
 
   void releaseResources() override {
@@ -219,7 +251,7 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
 
   cmp::SemiLogX m_plot;
 
-  AmpButton m_button_on_off;
+  AmpButton m_button_on_off, m_button_rca, m_button_moode;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SimpleFreqRespDemo)
 };

@@ -19,19 +19,17 @@ class AmpButton : public juce::ToggleButton {
   void paintButton(juce::Graphics& g, bool isMouseOverButton,
                    bool isButtonDown) override {
     auto bounds = getLocalBounds().toFloat();
-    g.setColour(isButtonDown ? juce::Colours::darkgrey
-                             : juce::Colours::lightgrey);
-    g.fillRect(bounds);
-
     auto iconBounds = bounds.reduced(10.0f);
     if (this->getToggleState()) {
       g.drawImageWithin(m_down_icon, iconBounds.getX(), iconBounds.getY(),
                         iconBounds.getWidth(), iconBounds.getHeight(),
                         juce::RectanglePlacement::centred);
     } else {
-      g.drawImageWithin(m_up_icon, iconBounds.getX(), iconBounds.getY(),
-                        iconBounds.getWidth(), iconBounds.getHeight(),
-                        juce::RectanglePlacement::centred);
+    g.setOpacity(0.7f);
+    g.drawImageWithin(m_up_icon, iconBounds.getX(), iconBounds.getY(),
+                iconBounds.getWidth(), iconBounds.getHeight(),
+                juce::RectanglePlacement::centred);
+    g.setOpacity(1.0f); // Reset opacity to default
     }
   }
 
