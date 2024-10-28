@@ -22,6 +22,7 @@
 #include <string>
 
 #include "AmpButton.h"
+#include "AmpColours.h"
 #include "cmp_datamodels.h"
 
 using namespace juce;
@@ -166,10 +167,16 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
 
   //==============================================================================
   void paint(Graphics& g) override {
-    g.setColour(juce::Colours::grey);
+    g.fillAll(juce::Colour(AmpColours::background));
 
-    g.drawRoundedRectangle(m_plot.getBounds().toFloat(), 5.0f, 5.0f);
-    g.drawRoundedRectangle(audioSetupComp.getBounds().toFloat(), 5.0f, 5.0f);
+    g.setColour(juce::Colour(AmpColours::blue));
+    g.setOpacity(0.5f);
+    g.drawRoundedRectangle(m_plot.getBounds().toFloat(), 10.0f, 3.0f);
+    g.drawRoundedRectangle(audioSetupComp.getBounds().toFloat(), 4.0f, 4.0f);
+    g.setOpacity(1.0f);
+    g.setColour(juce::Colour(AmpColours::grey));
+    g.drawRoundedRectangle(m_plot.getBounds().toFloat(), 10.0f, 1.0f);
+    g.drawRoundedRectangle(audioSetupComp.getBounds().toFloat(), 2.0f, 2.0f);
   }
 
   void timerCallback() override {
