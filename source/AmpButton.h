@@ -2,17 +2,27 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
-#include <random>
-
 class AmpButton : public juce::ToggleButton {
  public:
-  AmpButton(const juce::String& buttonName, const juce::Image& down_icon_image,
-            const juce::Image& up_icon_image)
-      : juce::ToggleButton(buttonName),
-        m_down_icon(down_icon_image),
-        m_up_icon(up_icon_image) {
-    if (m_down_icon.isNull()) {
-      DBG("Failed to load image");
+  AmpButton(const juce::String& buttonName, 
+           const juce::String& onImagePath,
+           const juce::String& offImagePath)
+      : juce::ToggleButton(buttonName) {
+    // Get the parent directory of the executable
+    auto execDir = juce::File::getSpecialLocation(
+                      juce::File::SpecialLocationType::currentExecutableFile)
+                      .getParentDirectory();
+
+    // Construct full paths
+    auto onPath = execDir.getChildFile(onImagePath);
+    auto offPath = execDir.getChildFile(offImagePath);
+
+    // Load images
+    m_down_icon = juce::ImageFileFormat::loadFrom(onPath);
+    m_up_icon = juce::ImageFileFormat::loadFrom(offPath);
+
+    if (m_down_icon.isNull() || m_up_icon.isNull()) {
+      DBG("Failed to load image: " + onPath.getFullPathName() + " or " + offPath.getFullPathName());
     }
   }
 
@@ -25,11 +35,11 @@ class AmpButton : public juce::ToggleButton {
                         iconBounds.getWidth(), iconBounds.getHeight(),
                         juce::RectanglePlacement::centred);
     } else {
-    g.setOpacity(0.7f);
-    g.drawImageWithin(m_up_icon, iconBounds.getX(), iconBounds.getY(),
-                iconBounds.getWidth(), iconBounds.getHeight(),
-                juce::RectanglePlacement::centred);
-    g.setOpacity(1.0f); // Reset opacity to default
+      g.setOpacity(0.7f);
+      g.drawImageWithin(m_up_icon, iconBounds.getX(), iconBounds.getY(),
+                  iconBounds.getWidth(), iconBounds.getHeight(),
+                  juce::RectanglePlacement::centred);
+      g.setOpacity(1.0f);
     }
   }
 

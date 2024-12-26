@@ -43,42 +43,9 @@ class SimpleFreqRespDemo : public AudioAppComponent, private Timer {
         ,
         forwardFFT(fftOrder),
         window(fftSize, juce::dsp::WindowingFunction<float>::hann),
-        m_button_on_off(AmpButton(
-            "On/Off",
-            juce::ImageFileFormat::loadFrom(
-                juce::File::getSpecialLocation(
-                    juce::File::SpecialLocationType::currentExecutableFile)
-                    .getParentDirectory()
-                    .getChildFile("img/on_off_icon_on.png")),
-            juce::ImageFileFormat::loadFrom(
-                juce::File::getSpecialLocation(
-                    juce::File::SpecialLocationType::currentExecutableFile)
-                    .getParentDirectory()
-                    .getChildFile("img/on_off_icon_off.png")))),
-        m_button_rca(AmpButton(
-            "RCA",
-            juce::ImageFileFormat::loadFrom(
-                juce::File::getSpecialLocation(
-                    juce::File::SpecialLocationType::currentExecutableFile)
-                    .getParentDirectory()
-                    .getChildFile("img/rca_icon_on.png")),
-            juce::ImageFileFormat::loadFrom(
-                juce::File::getSpecialLocation(
-                    juce::File::SpecialLocationType::currentExecutableFile)
-                    .getParentDirectory()
-                    .getChildFile("img/rca_icon_off.png")))),
-        m_button_moode(AmpButton(
-            "Moode",
-            juce::ImageFileFormat::loadFrom(
-                juce::File::getSpecialLocation(
-                    juce::File::SpecialLocationType::currentExecutableFile)
-                    .getParentDirectory()
-                    .getChildFile("img/moode_icon_on.png")),
-            juce::ImageFileFormat::loadFrom(
-                juce::File::getSpecialLocation(
-                    juce::File::SpecialLocationType::currentExecutableFile)
-                    .getParentDirectory()
-                    .getChildFile("img/moode_icon_off.png")))) {
+        m_button_on_off("On/Off", "img/on_off_icon_on.png", "img/on_off_icon_off.png"),
+        m_button_rca("RCA", "img/rca_icon_on.png", "img/rca_icon_off.png"),
+        m_button_moode("Moode", "img/moode_icon_on.png", "img/moode_icon_off.png") {
     RuntimePermissions::request(
         RuntimePermissions::recordAudio, [this](bool granted) {
           int numInputChannels = granted ? num_channels : 0;
