@@ -3,24 +3,40 @@ cmake_minimum_required(VERSION 3.12)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-project(SimpleFreqRespDemo VERSION 1.0.0)
+project(AudioSpectrumViewer VERSION 1.0.0)
 
-set(SOURCE source/${PROJECT_NAME}.cpp)
+# Find ALSA package
+find_package(ALSA REQUIRED)
 
-set(HEADERS source/${PROJECT_NAME}.h)
+set(SOURCE 
+    source/${PROJECT_NAME}.cpp
+    source/FFTProcessor.cpp
+    source/SpectrumAnalyzerView.cpp
+    source/Main.cpp
+)
+
+set(HEADERS 
+    source/${PROJECT_NAME}.h
+    source/FFTProcessor.h
+    source/SpectrumAnalyzerView.h
+    source/AmpButton.h
+    source/AmpColours.h
+)
 
 add_subdirectory(externals/JUCE)
 add_subdirectory(externals/CMP)
 
 juce_add_gui_app(${PROJECT_NAME}
-    PRODUCT_NAME "SimpleFreqRespDemo"
+    PRODUCT_NAME "Audio Spectrum Viewer"
     MICROPHONE_PERMISSION_ENABLED TRUE
     MICROPHONE_PERMISSION_TEXT "This example app needs permission do use your microphone.")
 
 target_sources(${PROJECT_NAME} PRIVATE
     ${SOURCE})
     
-target_include_directories(${PROJECT_NAME} PRIVATE ${HEADERS})
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    ${HEADERS}
+    ${ALSA_INCLUDE_DIRS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     JUCE_WEB_BROWSER=0
@@ -32,7 +48,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     juce::juce_gui_extra
     juce::juce_dsp
     juce::juce_audio_utils
-    cmp_plot)
+    cmp_plot
+    ${ALSA_LIBRARIES})
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
