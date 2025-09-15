@@ -19,6 +19,17 @@ AudioSpectrumViewer::AudioSpectrumViewer()
         onSettingsToggled(isOn);
     });
 
+    m_button_moode.setToggleCallback([this](bool isOn) {
+        onMoodeToggled(isOn);
+    });
+    
+    m_button_rca.setToggleCallback([this](bool isOn) {
+        onRcaToggled(isOn);
+    });
+
+    m_button_moode.setToggleState(true, juce::dontSendNotification);
+    m_button_rca.setToggleState(false, juce::dontSendNotification);
+
     audioSetupComp.setVisible(false);
 
     startTimerHz(30);
@@ -149,6 +160,16 @@ void AudioSpectrumViewer::onSettingsToggled(bool isOn)
     settingsVisible = isOn;
     audioSetupComp.setVisible(isOn);
     resized();
+}
+
+void AudioSpectrumViewer::onMoodeToggled(bool isOn)
+{
+    m_button_rca.setToggleState(!isOn, juce::dontSendNotification);
+}
+
+void AudioSpectrumViewer::onRcaToggled(bool isOn)
+{
+    m_button_moode.setToggleState(!isOn, juce::dontSendNotification);
 }
 
 void AudioSpectrumViewer::releaseResources()

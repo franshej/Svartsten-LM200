@@ -22,6 +22,8 @@ private:
     void timerCallback() override;
     void setupAudioPermissions();
     void onSettingsToggled(bool isOn);
+    void onMoodeToggled(bool isOn);
+    void onRcaToggled(bool isOn);
 
     juce::AudioDeviceSelectorComponent audioSetupComp;
     size_t numChannels {2};
