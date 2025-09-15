@@ -1,7 +1,6 @@
 #pragma once
 #include <juce_graphics/juce_graphics.h>  // Include the appropriate JUCE header
 
-#include <cstdint>
 
 struct AmpColours {
   static const juce::uint32 background{0xff0e0f14};

@@ -7,6 +7,7 @@ class SpectrumAnalyzerView : public juce::Component
 {
 public:
     SpectrumAnalyzerView();
+    ~SpectrumAnalyzerView() override;
     void paint(juce::Graphics& g) override;
     void resized() override;
     void updatePlot(const std::vector<std::vector<float>>& fftData,

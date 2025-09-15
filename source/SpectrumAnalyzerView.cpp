@@ -11,6 +11,11 @@ SpectrumAnalyzerView::SpectrumAnalyzerView()
     m_plot.setLookAndFeel(&m_lnf);
 }
 
+SpectrumAnalyzerView::~SpectrumAnalyzerView()
+{
+    m_plot.setLookAndFeel(nullptr);
+}
+
 void SpectrumAnalyzerView::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colour(AmpColours::blue));

@@ -103,46 +103,84 @@ void AudioSpectrumViewer::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colour(AmpColours::background));
 
+    // Add subtle separator line between main content and button area
+    auto buttonAreaHeight = proportionOfHeight(0.2f);
+    auto separatorY = getHeight() - buttonAreaHeight;
+    
+    g.setColour(juce::Colour(AmpColours::grey).withAlpha(0.3f));
+    g.fillRect(0, separatorY - 1, getWidth(), 1);
+
+    // Add subtle background for button area
+    g.setColour(juce::Colour(AmpColours::background).brighter(0.05f));
+    g.fillRect(0, separatorY, getWidth(), buttonAreaHeight);
+
+    // Border around settings panel when visible
     if (settingsVisible && audioSetupComp.isVisible())
     {
-        g.setColour(juce::Colour(AmpColours::blue));
-        g.setOpacity(0.5f);
-        g.drawRoundedRectangle(audioSetupComp.getBounds().toFloat(), 4.0f, 4.0f);
-        g.setOpacity(1.0f);
-        g.setColour(juce::Colour(AmpColours::grey));
-        g.drawRoundedRectangle(audioSetupComp.getBounds().toFloat(), 2.0f, 2.0f);
+        auto settingsBounds = audioSetupComp.getBounds().toFloat();
+        
+        // Add subtle drop shadow effect
+        g.setColour(juce::Colours::black.withAlpha(0.2f));
+        g.fillRoundedRectangle(settingsBounds.translated(2, 2), 6.0f);
+        
+        // Main border
+        g.setColour(juce::Colour(AmpColours::blue).withAlpha(0.4f));
+        g.fillRoundedRectangle(settingsBounds, 6.0f);
+        
+        // Inner border
+        g.setColour(juce::Colour(AmpColours::grey).withAlpha(0.8f));
+        g.drawRoundedRectangle(settingsBounds.reduced(1), 5.0f, 1.5f);
     }
+
+    // Add subtle border around analyzer area
+    auto analyzerBounds = analyzerView.getBounds().toFloat();
+    g.setColour(juce::Colour(AmpColours::grey).withAlpha(0.2f));
+    g.drawRoundedRectangle(analyzerBounds, 4.0f, 1.0f);
 }
 
 void AudioSpectrumViewer::resized()
 {
     auto rect = getLocalBounds();
+    
+    // Use less vertical space for buttons (20% instead of 30%)
+    auto buttonAreaHeight = proportionOfHeight(0.2f);
+    auto mainContentArea = rect.removeFromTop(getHeight() - buttonAreaHeight);
 
     if (settingsVisible)
     {
-        analyzerView.setBounds(rect.removeFromLeft(proportionOfWidth(0.7f))
-                              .removeFromTop(proportionOfHeight(0.7f)));
-        audioSetupComp.setBounds(rect.removeFromRight(proportionOfWidth(0.3f))
-                                .removeFromTop(proportionOfHeight(0.7f)));
+        auto analyzerArea = mainContentArea.removeFromLeft(proportionOfWidth(0.7f));
+        auto settingsArea = mainContentArea.removeFromRight(proportionOfWidth(0.3f));
+        
+        // Add margins for better visual separation
+        analyzerView.setBounds(analyzerArea.reduced(8, 8));
+        audioSetupComp.setBounds(settingsArea.reduced(8, 8));
     }
     else
     {
-        analyzerView.setBounds(rect.removeFromTop(proportionOfHeight(0.7f)));
+        // Add margin when settings are hidden for better visual balance
+        analyzerView.setBounds(mainContentArea.reduced(8, 8));
     }
 
-    auto rect_button = getLocalBounds()
-                          .removeFromBottom(proportionOfHeight(0.3f))
-                          .removeFromLeft(proportionOfWidth(0.25f));
-    m_button_on_off.setBounds(rect_button);
-
-    rect_button.setX(rect_button.getRight());
-    m_button_rca.setBounds(rect_button);
-
-    rect_button.setX(rect_button.getRight());
-    m_button_moode.setBounds(rect_button);
-
-    rect_button.setX(rect_button.getRight());
-    m_button_settings.setBounds(rect_button);
+    // Create button area with better spacing
+    auto buttonArea = getLocalBounds().removeFromBottom(buttonAreaHeight);
+    auto buttonMargin = 10;
+    auto buttonSpacing = 8;
+    
+    buttonArea.reduce(buttonMargin, buttonMargin);
+    
+    auto singleButtonWidth = (buttonArea.getWidth() - (3 * buttonSpacing)) / 4;
+    
+    // Layout buttons with proper spacing
+    m_button_on_off.setBounds(buttonArea.removeFromLeft(singleButtonWidth));
+    buttonArea.removeFromLeft(buttonSpacing);
+    
+    m_button_rca.setBounds(buttonArea.removeFromLeft(singleButtonWidth));
+    buttonArea.removeFromLeft(buttonSpacing);
+    
+    m_button_moode.setBounds(buttonArea.removeFromLeft(singleButtonWidth));
+    buttonArea.removeFromLeft(buttonSpacing);
+    
+    m_button_settings.setBounds(buttonArea.removeFromLeft(singleButtonWidth));
 }
 
 void AudioSpectrumViewer::setupAudioPermissions()
