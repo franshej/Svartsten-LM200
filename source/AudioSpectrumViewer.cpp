@@ -15,6 +15,12 @@ AudioSpectrumViewer::AudioSpectrumViewer()
     addAndMakeVisible(m_button_moode);
     addAndMakeVisible(m_button_settings);
 
+    m_button_settings.setToggleCallback([this](bool isOn) {
+        onSettingsToggled(isOn);
+    });
+
+    audioSetupComp.setVisible(false);
+
     startTimerHz(30);
     setSize(800, 480);
 }
@@ -86,21 +92,32 @@ void AudioSpectrumViewer::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colour(AmpColours::background));
 
-    g.setColour(juce::Colour(AmpColours::blue));
-    g.setOpacity(0.5f);
-    g.drawRoundedRectangle(audioSetupComp.getBounds().toFloat(), 4.0f, 4.0f);
-    g.setOpacity(1.0f);
-    g.setColour(juce::Colour(AmpColours::grey));
-    g.drawRoundedRectangle(audioSetupComp.getBounds().toFloat(), 2.0f, 2.0f);
+    if (settingsVisible && audioSetupComp.isVisible())
+    {
+        g.setColour(juce::Colour(AmpColours::blue));
+        g.setOpacity(0.5f);
+        g.drawRoundedRectangle(audioSetupComp.getBounds().toFloat(), 4.0f, 4.0f);
+        g.setOpacity(1.0f);
+        g.setColour(juce::Colour(AmpColours::grey));
+        g.drawRoundedRectangle(audioSetupComp.getBounds().toFloat(), 2.0f, 2.0f);
+    }
 }
 
 void AudioSpectrumViewer::resized()
 {
     auto rect = getLocalBounds();
 
-    analyzerView.setBounds(rect.removeFromLeft(proportionOfWidth(0.7f))
-                          .removeFromTop(proportionOfHeight(0.7f)));
-    audioSetupComp.setBounds(rect.removeFromRight(proportionOfWidth(0.3f)));
+    if (settingsVisible)
+    {
+        analyzerView.setBounds(rect.removeFromLeft(proportionOfWidth(0.7f))
+                              .removeFromTop(proportionOfHeight(0.7f)));
+        audioSetupComp.setBounds(rect.removeFromRight(proportionOfWidth(0.3f))
+                                .removeFromTop(proportionOfHeight(0.7f)));
+    }
+    else
+    {
+        analyzerView.setBounds(rect.removeFromTop(proportionOfHeight(0.7f)));
+    }
 
     auto rect_button = getLocalBounds()
                           .removeFromBottom(proportionOfHeight(0.3f))
@@ -125,6 +142,13 @@ void AudioSpectrumViewer::setupAudioPermissions()
             int numInputChannels = granted ? 2 : 0;
             setAudioChannels(numInputChannels, 0);
         });
+}
+
+void AudioSpectrumViewer::onSettingsToggled(bool isOn)
+{
+    settingsVisible = isOn;
+    audioSetupComp.setVisible(isOn);
+    resized();
 }
 
 void AudioSpectrumViewer::releaseResources()

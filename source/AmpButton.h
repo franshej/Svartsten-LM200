@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include <functional>
 
 class AmpButton : public juce::ToggleButton {
  public:
@@ -26,6 +27,18 @@ class AmpButton : public juce::ToggleButton {
     }
   }
 
+  // Set callback for toggle state changes
+  void setToggleCallback(std::function<void(bool)> callback) {
+    m_toggleCallback = callback;
+  }
+
+  void clicked() override {
+    juce::ToggleButton::clicked();
+    if (m_toggleCallback) {
+      m_toggleCallback(getToggleState());
+    }
+  }
+
   void paintButton(juce::Graphics& g, bool isMouseOverButton,
                    bool isButtonDown) override {
     auto bounds = getLocalBounds().toFloat();
@@ -45,4 +58,5 @@ class AmpButton : public juce::ToggleButton {
 
  private:
   juce::Image m_down_icon, m_up_icon;
+  std::function<void(bool)> m_toggleCallback;
 };
