@@ -6,6 +6,9 @@ SpectrumAnalyzerView::SpectrumAnalyzerView()
 {
     setupPlot();
     addAndMakeVisible(m_plot);
+
+    m_lnf.setColour(cmp::Plot::background_colour, juce::Colour(AmpColours::background));
+    m_plot.setLookAndFeel(&m_lnf);
 }
 
 void SpectrumAnalyzerView::paint(juce::Graphics& g)
