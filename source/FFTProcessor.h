@@ -1,7 +1,7 @@
 #pragma once
 #include <juce_dsp/juce_dsp.h>
-#include <array>
 #include <vector>
+#include <mutex>
 
 class FFTProcessor
 {
@@ -10,25 +10,33 @@ public:
     static constexpr auto fifoSize = 1 << fftOrder;
     static constexpr auto fftSize = fifoSize << 1;
 
-    FFTProcessor();
-    void prepare(double sampleRate);
+    FFTProcessor(size_t numChannels);
+    void prepare(double sampleRate, size_t numChannels);
     void pushNextSample(float sample, size_t channel);
-    bool isNextFFTBlockReady(size_t channel) const { return nextFFTBlockReady[channel]; }
-    void clearFFTBlockReady(size_t channel) { nextFFTBlockReady[channel] = false; }
+    bool isNextFFTBlockReady(size_t channel) const { 
+        return channel < numChannels ? nextFFTBlockReady[channel] : false; 
+    }
+    void clearFFTBlockReady(size_t channel) { 
+        if (channel < numChannels) 
+            nextFFTBlockReady[channel] = false; 
+    }
     const std::vector<std::vector<float>>& getFrequencyData() const { return fftData; }
     const std::vector<std::vector<float>>& getXData() const { return xData; }
+    void waitForReady();
 
 private:
     void calculateFrequencyResponse(size_t channel);
 
-    static constexpr size_t numChannels = 2;
+    size_t numChannels {2};
     juce::dsp::FFT forwardFFT;
     juce::dsp::WindowingFunction<float> window;
 
-    std::vector<std::vector<float>> fifo = std::vector<std::vector<float>>(numChannels);
-    std::vector<std::vector<float>> fftData = std::vector<std::vector<float>>(numChannels);
-    std::vector<std::vector<float>> fftDataSmooth = std::vector<std::vector<float>>(numChannels);
-    std::vector<std::vector<float>> xData = std::vector<std::vector<float>>(numChannels);
-    std::array<size_t, numChannels> fifoIndex{};
-    std::array<bool, numChannels> nextFFTBlockReady{};
+    std::vector<std::vector<float>> fifo;
+    std::vector<std::vector<float>> fftData;
+    std::vector<std::vector<float>> fftDataSmooth;
+    std::vector<std::vector<float>> xData;
+    std::vector<size_t> fifoIndex;
+    std::vector<bool> nextFFTBlockReady;
+
+    mutable std::mutex readyMutex;
 }; 

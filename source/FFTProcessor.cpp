@@ -1,9 +1,17 @@
 #include "FFTProcessor.h"
 
-FFTProcessor::FFTProcessor()
-    : forwardFFT(fftOrder)
-    , window(fftSize, juce::dsp::WindowingFunction<float>::hann)
+FFTProcessor::FFTProcessor(size_t numChannels)
+    : numChannels(numChannels),
+    forwardFFT(fftOrder),
+    window(fftSize, juce::dsp::WindowingFunction<float>::hann)
 {
+    fifo.resize(numChannels);
+    fftData.resize(numChannels);
+    fftDataSmooth.resize(numChannels);
+    xData.resize(numChannels);
+    fifoIndex.resize(numChannels);
+    nextFFTBlockReady.resize(numChannels);
+
     for (auto& f : fifo)
         f.resize(fifoSize);
     for (auto& f : fftData)
@@ -12,10 +20,35 @@ FFTProcessor::FFTProcessor()
         f.resize(fftSize);
     for (auto& x : xData)
         x.resize(fftSize);
+    
+    std::fill(fifoIndex.begin(), fifoIndex.end(), 0);
+    std::fill(nextFFTBlockReady.begin(), nextFFTBlockReady.end(), false);
 }
 
-void FFTProcessor::prepare(double sampleRate)
+void FFTProcessor::prepare(double sampleRate, size_t numChannels)
 {
+    std::lock_guard<std::mutex> lock(readyMutex);
+    this->numChannels = numChannels;
+
+    fifo.resize(numChannels);
+    fftData.resize(numChannels);
+    fftDataSmooth.resize(numChannels);
+    xData.resize(numChannels);
+    fifoIndex.resize(numChannels);
+    nextFFTBlockReady.resize(numChannels);
+
+    for (auto& f : fifo)
+        f.resize(fifoSize);
+    for (auto& f : fftData)
+        f.resize(fftSize);
+    for (auto& f : fftDataSmooth)
+        f.resize(fftSize);
+    for (auto& x : xData)
+        x.resize(fftSize);
+
+    std::fill(fifoIndex.begin(), fifoIndex.end(), 0);
+    std::fill(nextFFTBlockReady.begin(), nextFFTBlockReady.end(), false);
+
     for (auto& x : xData) {
         float delta = static_cast<float>(sampleRate + 1) / static_cast<float>(fftSize) * 2;
         for (size_t i = 0; i < x.size(); ++i)
@@ -25,6 +58,11 @@ void FFTProcessor::prepare(double sampleRate)
 
 void FFTProcessor::pushNextSample(float sample, size_t channel)
 {
+    std::lock_guard<std::mutex> lock(readyMutex);
+
+    if (channel >= numChannels)
+        return;
+
     if (fifoIndex[channel] == fifoSize)
     {
         if (!nextFFTBlockReady[channel])

@@ -1,8 +1,10 @@
 #include "AudioSpectrumViewer.h"
 #include "AmpColours.h"
+#include "FFTProcessor.h"
 
 AudioSpectrumViewer::AudioSpectrumViewer()
-    : audioSetupComp(deviceManager, 0, 2, 0, 0, false, false, false, false)
+    : fftProcessor(2), 
+    audioSetupComp(deviceManager, 0, 2, 0, 0, false, false, false, false)
 {
     setupAudioPermissions();
 
@@ -18,23 +20,37 @@ AudioSpectrumViewer::AudioSpectrumViewer()
 
 AudioSpectrumViewer::~AudioSpectrumViewer()
 {
+    stopTimer();
+    
+    shutdownAudio();
 }
 
 void AudioSpectrumViewer::prepareToPlay(int /*samplesPerBlockExpected*/, double sampleRate)
 {
-    fftProcessor.prepare(sampleRate);
+    numChannels = audioSetupComp.deviceManager.getAudioDeviceSetup().inputChannels.countNumberOfSetBits();
+    fftProcessor.prepare(sampleRate, numChannels);
+    updatePlotXData = true;
 }
 
 
 void AudioSpectrumViewer::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
+    if (bufferToFill.buffer == nullptr)
+    {
+        return;
+    }
+    
     if (bufferToFill.buffer->getNumChannels() > 0)
     {
         for (auto channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel)
         {
             const auto* channelData = bufferToFill.buffer->getReadPointer(channel, bufferToFill.startSample);
-            for (auto i = 0; i < bufferToFill.numSamples; ++i){
-                fftProcessor.pushNextSample(channelData[i], channel);
+            if (channelData != nullptr)
+            {
+                for (auto i = 0; i < bufferToFill.numSamples; ++i)
+                {
+                    fftProcessor.pushNextSample(channelData[i], channel);
+                }
             }
         }
     }
@@ -43,19 +59,25 @@ void AudioSpectrumViewer::getNextAudioBlock(const juce::AudioSourceChannelInfo& 
 
 void AudioSpectrumViewer::timerCallback()
 {
+    if (!audioSetupComp.deviceManager.getCurrentAudioDevice())
+        return;
+        
     bool allChannelsReady = true;
-    for (size_t i = 0; i < 2; ++i)
+    
+    if (numChannels == 0)
+        return;
+    
+    for (size_t i = 0; i < numChannels; ++i)
         allChannelsReady &= fftProcessor.isNextFFTBlockReady(i);
 
     if (allChannelsReady)
     {
-        static bool firstUpdate = true;
         analyzerView.updatePlot(fftProcessor.getFrequencyData(), 
                                fftProcessor.getXData(), 
-                               firstUpdate);
-        fftProcessor.clearFFTBlockReady(0);
-        fftProcessor.clearFFTBlockReady(1);
-        firstUpdate = false;
+                               updatePlotXData);
+        for (size_t i = 0; i < numChannels; ++i)
+            fftProcessor.clearFFTBlockReady(i);
+        updatePlotXData = false;
     }
 }
 

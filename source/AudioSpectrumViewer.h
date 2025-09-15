@@ -23,9 +23,11 @@ private:
     void setupAudioPermissions();
 
     juce::AudioDeviceSelectorComponent audioSetupComp;
-    
+    size_t numChannels {2};
     FFTProcessor fftProcessor;
     SpectrumAnalyzerView analyzerView;
+    bool updatePlotXData {true};
+
     
     AmpButton m_button_on_off{"On/Off", "img/on_off_icon_on.png", "img/on_off_icon_off.png"};
     AmpButton m_button_rca{"RCA", "img/rca_icon_on.png", "img/rca_icon_off.png"};

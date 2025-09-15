@@ -25,9 +25,9 @@ void SpectrumAnalyzerView::resized()
 
 void SpectrumAnalyzerView::updatePlot(const std::vector<std::vector<float>>& fftData,
                                      const std::vector<std::vector<float>>& xData,
-                                     bool firstUpdate)
+                                     bool updatePlotXData)
 {
-    if (firstUpdate)
+    if (updatePlotXData)
     {
         cmp::GraphAttributeList attr(2);
         attr[0].gradient_colours = {
