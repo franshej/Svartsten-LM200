@@ -13,6 +13,7 @@ AudioSpectrumViewer::AudioSpectrumViewer()
     addAndMakeVisible(m_button_on_off);
     addAndMakeVisible(m_button_rca);
     addAndMakeVisible(m_button_moode);
+    addAndMakeVisible(m_button_settings);
 
     startTimerHz(30);
     setSize(800, 480);
@@ -111,6 +112,9 @@ void AudioSpectrumViewer::resized()
 
     rect_button.setX(rect_button.getRight());
     m_button_moode.setBounds(rect_button);
+
+    rect_button.setX(rect_button.getRight());
+    m_button_settings.setBounds(rect_button);
 }
 
 void AudioSpectrumViewer::setupAudioPermissions()
