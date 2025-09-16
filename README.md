@@ -22,10 +22,3 @@ A modern audio spectrum visualizer and control interface for the Svartsten L200 
 mkdir build && cd build
 cmake ..
 make
-
-# Run the spectrum viewer
-./AudioSpectrumViewer
-
-## License
-
-See [LICENSE](LICENSE) file.
