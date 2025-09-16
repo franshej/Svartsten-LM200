@@ -43,11 +43,30 @@ class AmpButton : public juce::ToggleButton {
                    bool isButtonDown) override {
     auto bounds = getLocalBounds().toFloat();
     auto iconBounds = bounds.reduced(0.0f);
+    
     if (this->getToggleState()) {
+      // Create white gradient for "pressed" effect (bottom to top)
+      juce::ColourGradient gradient(
+        juce::Colours::white.withAlpha(0.3f), bounds.getBottomLeft(),
+        juce::Colours::white.withAlpha(0.0f), bounds.getTopLeft(),
+        false
+      );
+      
+      // Fill the button with the gradient
+      g.setGradientFill(gradient);
+      g.fillRoundedRectangle(bounds, 8.0f);
+      
+      // Add a subtle inner glow effect
+      g.setColour(juce::Colours::white.withAlpha(0.05f));
+      g.drawRoundedRectangle(bounds.reduced(1.0f), 7.0f, 1.5f);
+      
+      // Draw the icon with full opacity
+      g.setOpacity(1.0f);
       g.drawImageWithin(m_down_icon, iconBounds.getX(), iconBounds.getY(),
                         iconBounds.getWidth(), iconBounds.getHeight(),
                         juce::RectanglePlacement::centred);
     } else {
+      // Normal state - just draw icon with reduced opacity
       g.setOpacity(0.7f);
       g.drawImageWithin(m_up_icon, iconBounds.getX(), iconBounds.getY(),
                   iconBounds.getWidth(), iconBounds.getHeight(),
