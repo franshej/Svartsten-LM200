@@ -42,7 +42,7 @@ class AmpButton : public juce::ToggleButton {
   void paintButton(juce::Graphics& g, bool isMouseOverButton,
                    bool isButtonDown) override {
     auto bounds = getLocalBounds().toFloat();
-    auto iconBounds = bounds.reduced(10.0f);
+    auto iconBounds = bounds.reduced(0.0f);
     if (this->getToggleState()) {
       g.drawImageWithin(m_down_icon, iconBounds.getX(), iconBounds.getY(),
                         iconBounds.getWidth(), iconBounds.getHeight(),
