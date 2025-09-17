@@ -5,6 +5,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project(AudioSpectrumViewer VERSION 1.0.0)
 
+# Set optimization flags for Release builds
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
+
+# Raspberry Pi 3B+ specific optimizations with NEON support
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -funsafe-math-optimizations")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -funsafe-math-optimizations")
+endif()
+
 # Find ALSA package
 find_package(ALSA REQUIRED)
 
