@@ -58,11 +58,6 @@ void FFTProcessor::prepare(double sampleRate, size_t numChannels)
 
 void FFTProcessor::pushNextSample(float sample, size_t channel)
 {
-    std::lock_guard<std::mutex> lock(readyMutex);
-
-    if (channel >= numChannels)
-        return;
-
     if (fifoIndex[channel] == fifoSize)
     {
         if (!nextFFTBlockReady[channel])
