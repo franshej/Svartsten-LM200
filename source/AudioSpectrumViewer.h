@@ -21,6 +21,7 @@ private:
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
     void timerCallback() override;
     void setupAudioPermissions();
+    void setupDefaultAudioDevice();
     void onSettingsToggled(bool isOn);
     void onMoodeToggled(bool isOn);
     void onRcaToggled(bool isOn);

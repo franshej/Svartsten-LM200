@@ -32,6 +32,8 @@ AudioSpectrumViewer::AudioSpectrumViewer()
 
     audioSetupComp.setVisible(false);
 
+    setupDefaultAudioDevice();
+
     startTimerHz(30);
     setSize(800, 480);
 }
@@ -191,6 +193,32 @@ void AudioSpectrumViewer::setupAudioPermissions()
             int numInputChannels = granted ? 2 : 0;
             setAudioChannels(numInputChannels, 0);
         });
+}
+
+void AudioSpectrumViewer::setupDefaultAudioDevice()
+{
+    auto currentSetup = deviceManager.getAudioDeviceSetup();
+    
+    // Tries to use the Loopback device on the Raspberry Pi 3B+
+    currentSetup.inputDeviceName = "Loopback, Loopback PCM; Direct sample snooping device (2)";
+    currentSetup.sampleRate = 48000.0;
+    currentSetup.bufferSize = 512;
+    currentSetup.inputChannels.setRange(0, 2, true);
+    
+    auto result = deviceManager.setAudioDeviceSetup(currentSetup, true);
+    
+    if (result.isNotEmpty())
+    {
+        currentSetup.sampleRate = 44100.0;
+        deviceManager.setAudioDeviceSetup(currentSetup, true);
+    }
+    else 
+    {
+        auto fallbackSetup = deviceManager.getAudioDeviceSetup();
+        fallbackSetup.inputDeviceName = "";
+        fallbackSetup.inputChannels.setRange(0, 2, true);
+        deviceManager.setAudioDeviceSetup(fallbackSetup, true);
+    }
 }
 
 void AudioSpectrumViewer::onSettingsToggled(bool isOn)
