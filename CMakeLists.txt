@@ -10,13 +10,21 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
 
 # Raspberry Pi 3B+ specific optimizations with NEON support
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -funsafe-math-optimizations")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -funsafe-math-optimizations")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=cortex-a53 -march=armv8-a+simd -mtune=cortex-a53 -funsafe-math-optimizations")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-a53 -march=armv8-a+simd -mtune=cortex-a53 -funsafe-math-optimizations")
+        message(STATUS "Building for Raspberry Pi 3B+ (64-bit ARM Linux) with NEON optimizations")
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -funsafe-math-optimizations")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -funsafe-math-optimizations")
+        message(STATUS "Building for Raspberry Pi 3B+ (32-bit ARM Linux) with NEON optimizations")
+    endif()
+    
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+        find_package(ALSA REQUIRED)
+    endif()
 endif()
-
-# Find ALSA package
-find_package(ALSA REQUIRED)
 
 set(SOURCE 
     source/${PROJECT_NAME}.cpp
