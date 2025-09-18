@@ -1,6 +1,6 @@
-# Svartsten L200 Amplifier UI
+# Svartsten LM200 Amplifier UI
 
-A modern audio spectrum visualizer and control interface for the Svartsten L200 amplifier, built with JUCE framework.
+A modern audio spectrum visualizer and control interface for the Svartsten LM200 amplifier, built with JUCE framework.
 
 ## Features
 
