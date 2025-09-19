@@ -140,7 +140,6 @@ void SpectrumAnalyzerView::setupPlot()
     m_plot.setDownsamplingType(cmp::DownsamplingType::x_downsampling);
     m_plot.setYLabel("Power [dB]");
     m_plot.setXLabel("Frequency [Hz]");
-    m_plot.yLim(-60.0f, 10.0f);
+    m_plot.yLim(-50.0f, 5.0f);
     m_plot.xLim(100.0f, 22'000.0f);
-    m_plot.setLegend({"Left input", "Right input"});
 } 
