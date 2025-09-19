@@ -32,7 +32,8 @@ public:
     void resized() override;
     void updatePlot(const std::vector<std::vector<float>>& fftData,
                    const std::vector<std::vector<float>>& xData,
-                   bool firstUpdate = false);
+                   bool firstUpdate = false,
+                   const std::vector<int>& selectedChannels = {0, 1});
     
 private:
     void setupPlot();

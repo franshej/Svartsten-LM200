@@ -113,19 +113,32 @@ void SpectrumAnalyzerView::resized()
 
 void SpectrumAnalyzerView::updatePlot(const std::vector<std::vector<float>>& fftData,
                                      const std::vector<std::vector<float>>& xData,
-                                     bool updatePlotXData)
+                                     bool updatePlotXData,
+                                     const std::vector<int>& selectedChannels)
 {
     if (updatePlotXData)
     {
-        cmp::GraphAttributeList attr(2);
+        // Create attributes for the number of channels we're actually plotting
+        cmp::GraphAttributeList attr(fftData.size());
         
-        attr[0].gradient_colours = {
-            juce::Colour(AmpColours::blue).withAlpha(0.8f),
-            juce::Colour(AmpColours::blue).darker(0.3f).withAlpha(0.4f)};
-            
-        attr[1].gradient_colours = {
-            juce::Colour(AmpColours::yellow).withAlpha(0.8f),
-            juce::Colour(AmpColours::yellow).darker(0.4f).withAlpha(0.4f)};
+        // Map channel indices to appropriate colors
+        // attr[0] is left (blue), attr[1] is right (yellow)
+        for (size_t i = 0; i < selectedChannels.size() && i < fftData.size(); ++i)
+        {
+            int channelIndex = selectedChannels[i];
+            if (channelIndex == 0) // Left channel
+            {
+                attr[i].gradient_colours = {
+                    juce::Colour(AmpColours::blue).withAlpha(0.8f),
+                    juce::Colour(AmpColours::blue).darker(0.3f).withAlpha(0.4f)};
+            }
+            else if (channelIndex == 1) // Right channel
+            {
+                attr[i].gradient_colours = {
+                    juce::Colour(AmpColours::yellow).withAlpha(0.8f),
+                    juce::Colour(AmpColours::yellow).darker(0.4f).withAlpha(0.4f)};
+            }
+        }
             
         m_plot.plot(fftData, xData, attr);
     }
