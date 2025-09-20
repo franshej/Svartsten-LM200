@@ -1,4 +1,5 @@
 #include "FFTProcessor.h"
+#include <cstring>
 
 FFTProcessor::FFTProcessor(size_t numChannels)
     : numChannels(numChannels),
@@ -72,6 +73,38 @@ void FFTProcessor::pushNextSample(float sample, size_t channel)
     }
 
     fifo[channel][fifoIndex[channel]++] = sample;
+}
+
+void FFTProcessor::pushSamples(const float* samples, int numSamples, size_t channel)
+{
+    if (channel >= numChannels || samples == nullptr || numSamples <= 0)
+        return;
+    
+    int samplesRemaining = numSamples;
+    int sampleIndex = 0;
+    
+    while (samplesRemaining > 0)
+    {
+        if (fifoIndex[channel] == fifoSize)
+        {
+            if (!nextFFTBlockReady[channel])
+            {
+                std::memcpy(fftData[channel].data(), fifo[channel].data(), fifoSize * sizeof(float));
+                calculateFrequencyResponse(channel);
+                nextFFTBlockReady[channel] = true;
+            } else {
+                return;
+            }
+            fifoIndex[channel] = 0;
+        }
+        
+        int samplesToCopy = std::min(samplesRemaining, static_cast<int>(fifoSize - fifoIndex[channel]));
+        std::memcpy(&fifo[channel][fifoIndex[channel]], &samples[sampleIndex], samplesToCopy * sizeof(float));
+        
+        fifoIndex[channel] += samplesToCopy;
+        sampleIndex += samplesToCopy;
+        samplesRemaining -= samplesToCopy;
+    }
 }
 
 void FFTProcessor::calculateFrequencyResponse(size_t channel)

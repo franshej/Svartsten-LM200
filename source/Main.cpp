@@ -1,4 +1,10 @@
 #include "AudioSpectrumViewer.h"
+#include <thread>
+
+#ifdef __linux__
+    #include <sys/resource.h>
+    #include <unistd.h>
+#endif
 
 class AudioSpectrumViewerApplication : public juce::JUCEApplication
 {
@@ -8,6 +14,10 @@ public:
 
     void initialise(const juce::String&) override
     {
+#ifdef __linux__
+        setpriority(PRIO_PROCESS, 0, 10);
+#endif
+        
         mainWindow.reset(new MainWindow(getApplicationName()));
     }
 

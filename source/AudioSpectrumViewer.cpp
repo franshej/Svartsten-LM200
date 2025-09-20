@@ -3,8 +3,8 @@
 #include "FFTProcessor.h"
 
 AudioSpectrumViewer::AudioSpectrumViewer()
-    : fftProcessor(2), 
-    audioSetupComp(deviceManager, 0, 2, 0, 0, false, false, false, false)
+    : fftProcessor(1), 
+    audioSetupComp(deviceManager, 0, 1, 0, 0, false, false, false, false)
 {
     setupAudioPermissions();
 
@@ -34,7 +34,7 @@ AudioSpectrumViewer::AudioSpectrumViewer()
 
     setupDefaultAudioDevice();
 
-    startTimerHz(30);
+    startTimerHz(20);
     setSize(800, 480);
 }
 
@@ -47,6 +47,7 @@ AudioSpectrumViewer::~AudioSpectrumViewer()
 
 void AudioSpectrumViewer::prepareToPlay(int /*samplesPerBlockExpected*/, double sampleRate)
 {
+    
     numChannels = audioSetupComp.deviceManager.getAudioDeviceSetup().inputChannels.countNumberOfSetBits();
     fftProcessor.prepare(sampleRate, numChannels);
     updatePlotXData = true;
@@ -67,10 +68,7 @@ void AudioSpectrumViewer::getNextAudioBlock(const juce::AudioSourceChannelInfo& 
             const auto* channelData = bufferToFill.buffer->getReadPointer(channel, bufferToFill.startSample);
             if (channelData != nullptr)
             {
-                for (auto i = 0; i < bufferToFill.numSamples; ++i)
-                {
-                    fftProcessor.pushNextSample(channelData[i], channel);
-                }
+                fftProcessor.pushSamples(channelData, bufferToFill.numSamples, channel);
             }
         }
     }
@@ -190,14 +188,14 @@ void AudioSpectrumViewer::setupAudioPermissions()
     juce::RuntimePermissions::request(
         juce::RuntimePermissions::recordAudio,
         [this](bool granted) {
-            int numInputChannels = granted ? 2 : 0;
+            int numInputChannels = granted ? 1 : 0;
             setAudioChannels(numInputChannels, 0);
         });
 }
 
 void AudioSpectrumViewer::setupDefaultAudioDevice()
 {
-    deviceManager.initialise(2, 0, nullptr, true, "Loopback, Loopback PCM; Direct sample snooping device (2)", nullptr);
+    deviceManager.initialise(1, 0, nullptr, true, "Loopback, Loopback PCM; Direct sample snooping device (1)", nullptr);
 }
 
 void AudioSpectrumViewer::onSettingsToggled(bool isOn)
