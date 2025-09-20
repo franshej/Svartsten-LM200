@@ -13,6 +13,7 @@ public:
     FFTProcessor(size_t numChannels);
     void prepare(double sampleRate, size_t numChannels);
     void pushNextSample(float sample, size_t channel);
+    void pushSamples(const float* samples, int numSamples, size_t channel);
     bool isNextFFTBlockReady(size_t channel) const { 
         return channel < numChannels ? nextFFTBlockReady[channel] : false; 
     }

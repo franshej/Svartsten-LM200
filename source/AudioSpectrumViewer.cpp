@@ -67,10 +67,7 @@ void AudioSpectrumViewer::getNextAudioBlock(const juce::AudioSourceChannelInfo& 
             const auto* channelData = bufferToFill.buffer->getReadPointer(channel, bufferToFill.startSample);
             if (channelData != nullptr)
             {
-                for (auto i = 0; i < bufferToFill.numSamples; ++i)
-                {
-                    fftProcessor.pushNextSample(channelData[i], channel);
-                }
+                fftProcessor.pushSamples(channelData, bufferToFill.numSamples, channel);
             }
         }
     }

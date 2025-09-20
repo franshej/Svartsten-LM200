@@ -74,6 +74,30 @@ void FFTProcessor::pushNextSample(float sample, size_t channel)
     fifo[channel][fifoIndex[channel]++] = sample;
 }
 
+void FFTProcessor::pushSamples(const float* samples, int numSamples, size_t channel)
+{
+    if (channel >= numChannels || samples == nullptr || numSamples <= 0)
+        return;
+    
+    for (int i = 0; i < numSamples; ++i)
+    {
+        if (fifoIndex[channel] == fifoSize)
+        {
+            if (!nextFFTBlockReady[channel])
+            {
+                std::copy(fifo[channel].begin(), fifo[channel].end(), fftData[channel].begin());
+                calculateFrequencyResponse(channel);
+                nextFFTBlockReady[channel] = true;
+            } else {
+                return;
+            }
+            fifoIndex[channel] = 0;
+        }
+        
+        fifo[channel][fifoIndex[channel]++] = samples[i];
+    }
+}
+
 void FFTProcessor::calculateFrequencyResponse(size_t channel)
 {
     window.multiplyWithWindowingTable(fftData[channel].data(), fftSize);
