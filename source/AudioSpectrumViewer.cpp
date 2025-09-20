@@ -34,7 +34,7 @@ AudioSpectrumViewer::AudioSpectrumViewer()
 
     setupDefaultAudioDevice();
 
-    startTimerHz(30);
+    startTimerHz(20);
     setSize(800, 480);
 }
 
@@ -47,6 +47,7 @@ AudioSpectrumViewer::~AudioSpectrumViewer()
 
 void AudioSpectrumViewer::prepareToPlay(int /*samplesPerBlockExpected*/, double sampleRate)
 {
+    
     numChannels = audioSetupComp.deviceManager.getAudioDeviceSetup().inputChannels.countNumberOfSetBits();
     fftProcessor.prepare(sampleRate, numChannels);
     updatePlotXData = true;
