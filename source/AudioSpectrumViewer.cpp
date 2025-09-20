@@ -49,6 +49,7 @@ void AudioSpectrumViewer::prepareToPlay(int /*samplesPerBlockExpected*/, double 
 {
     
     numChannels = audioSetupComp.deviceManager.getAudioDeviceSetup().inputChannels.countNumberOfSetBits();
+    numChannels = std::min(numChannels, static_cast<size_t>(1));
     fftProcessor.prepare(sampleRate, numChannels);
     updatePlotXData = true;
 }
@@ -63,7 +64,7 @@ void AudioSpectrumViewer::getNextAudioBlock(const juce::AudioSourceChannelInfo& 
     
     if (bufferToFill.buffer->getNumChannels() > 0)
     {
-        for (auto channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel)
+        for (auto channel = 0; channel < numChannels; ++channel)
         {
             const auto* channelData = bufferToFill.buffer->getReadPointer(channel, bufferToFill.startSample);
             if (channelData != nullptr)
