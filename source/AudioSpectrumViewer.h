@@ -27,7 +27,8 @@ private:
     void onRcaToggled(bool isOn);
 
     juce::AudioDeviceSelectorComponent audioSetupComp;
-    size_t numChannels {2};
+    static constexpr size_t maxNumInputChannels = 1;
+    size_t numChannels {maxNumInputChannels};
     FFTProcessor fftProcessor;
     SpectrumAnalyzerView analyzerView;
     bool updatePlotXData {true};

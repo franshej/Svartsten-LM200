@@ -3,8 +3,8 @@
 #include "FFTProcessor.h"
 
 AudioSpectrumViewer::AudioSpectrumViewer()
-    : fftProcessor(1), 
-    audioSetupComp(deviceManager, 0, 1, 0, 0, false, false, false, false)
+    : fftProcessor(maxNumInputChannels), 
+    audioSetupComp(deviceManager, 0, maxNumInputChannels, 0, 0, false, false, false, false)
 {
     setupAudioPermissions();
 
@@ -49,7 +49,7 @@ void AudioSpectrumViewer::prepareToPlay(int /*samplesPerBlockExpected*/, double 
 {
     
     numChannels = audioSetupComp.deviceManager.getAudioDeviceSetup().inputChannels.countNumberOfSetBits();
-    numChannels = std::min(numChannels, static_cast<size_t>(1));
+    numChannels = std::min(numChannels, maxNumInputChannels);
     fftProcessor.prepare(sampleRate, numChannels);
     updatePlotXData = true;
 }
@@ -189,14 +189,14 @@ void AudioSpectrumViewer::setupAudioPermissions()
     juce::RuntimePermissions::request(
         juce::RuntimePermissions::recordAudio,
         [this](bool granted) {
-            int numInputChannels = granted ? 1 : 0;
+            int numInputChannels = granted ? maxNumInputChannels : 0;
             setAudioChannels(numInputChannels, 0);
         });
 }
 
 void AudioSpectrumViewer::setupDefaultAudioDevice()
 {
-    deviceManager.initialise(1, 0, nullptr, true, "Loopback, Loopback PCM; Direct sample snooping device (1)", nullptr);
+    deviceManager.initialise(maxNumInputChannels, 0, nullptr, true, "Loopback, Loopback PCM; Direct sample snooping device (1)", nullptr);
 }
 
 void AudioSpectrumViewer::onSettingsToggled(bool isOn)
