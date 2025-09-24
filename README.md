@@ -2,6 +2,10 @@
 
 Svartsten LM200 is a 2 x 200 W low noise power amplifier based on lateral MOSFETs instead of traditional bipolar transistors. It uses a Raspberry Pi 3B+ for streaming services (Spotify, AirPlay) as well as hosting the UI interface. Additionally, for perfect sound the amplifier includes Dirac Live room correction technology.
 
+| Front View | Interface | Inside View |
+|------------|-----------|-------------|
+| ![Front View](readme-images/front.jpg) | ![Interface](readme-images/close-interface.jpg) | ![Inside View](readme-images/inside.jpg) |
+
 ## DAC
 
 The Raspberry Pi 3B+ uses a USBStreamer from miniDSP as an audio interface which is further connected to a DAC AKM4440 board which is connected to the amplifier boards. The DAC and Raspberry Pi 3B+ use separate power supplies to minimize the noise from the Raspberry Pi. The USB cable between the Raspberry Pi 3B+ and USBStreamer is galvanically isolated using the ADUM4160 chip to minimize ground noise from the power hungry Raspberry Pi.
